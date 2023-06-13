@@ -29,11 +29,11 @@ describe("Registartion and login", () => {
 
 
     
-    it("login", () => {
+    it.only("login", () => {
       cy.get('#loginFrm_loginname').type('baurina11111');
       cy.get('#loginFrm_password').type('1234567');
-
       cy.get('[title="Login"]').click();
 
+      cy.get('span.subtext').should('contain', 'Yana')
     })
 });
