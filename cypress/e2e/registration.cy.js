@@ -1,39 +1,62 @@
-import homePage from "../support/pages/HomePage";
-import loginPage from "../support/pages/LoginPage";
+import { faker } from '@faker-js/faker'
+import user from '../fixtures/user.json'
 
-describe("Registartion and login", () => {
-  beforeEach(() => {
-    cy.visit('https://automationteststore.com/index.php?rt=account/login');
+user.username = faker.internet.userName();
+user.firstName = faker.person.firstName();
+user.lastName = faker.person.lastName();
+user.postCode = faker.location.zipCode('####');
+user.address = faker.location.street();
+user.email = faker.internet.email();
+user.password = faker.internet.password({ length: 20 })
 
-  });
+it('Registration', () => {
+  cy.visit('/');
 
-    it("registration", () => {
-      cy.get('[title="Continue"]').click();
-      cy.get('#AccountFrm_firstname').type('Yana');
-      cy.get('#AccountFrm_lastname').type('Baurina');
-      cy.get('#AccountFrm_email').type('baurina11111@gmail.com');
-      cy.get('#AccountFrm_address_1').type('88 High St, ');
-      cy.get('#AccountFrm_city').type('Galashiels');
-      cy.get('#AccountFrm_zone_id').select('Scottish Borders');
-      cy.get('#AccountFrm_postcode').type('TD1 1SQ');
-      cy.get('#AccountFrm_loginname').type('baurina11111');
-      cy.get('#AccountFrm_password').type('1234567');
-      cy.get('#AccountFrm_confirm').type('1234567');
-      cy.get('#AccountFrm_agree').check('1');
+  cy.get('.topnavbar [data-id="menu_account"]').click();
 
-      cy.get('[title="Continue"]').click();
+  cy.get('#accountFrm button').click();
 
-      cy.get('[class="maintext"]').contains('text', ' Your Account Has Been Created!');
-    })
+  cy.get('#AccountFrm_firstname').type(user.firstName);
+  cy.get('#AccountFrm_lastname').type(user.lastName);
+  cy.get('#AccountFrm_email').type(user.email);
+
+  cy.get('#AccountFrm_address_1').type(user.address);
+  cy.get('#AccountFrm_city').type(user.city);
+
+  cy.get('#AccountFrm_postcode').type(user.postCode);
+  cy.get('#AccountFrm_country_id').select(user.countryId);
+
+  cy.get('#AccountFrm_loginname').type(user.username);
+  cy.get('#AccountFrm_password').type(user.password);
+  cy.get('#AccountFrm_confirm').type(user.password);
+
+  cy.get('#AccountFrm_zone_id').select(user.zone);
+
+  cy.get('#AccountFrm_newsletter0').check();
+  cy.get('#AccountFrm_agree').check();
+
+  cy.get('[title="Continue"]').click();
+
+  cy.get('[class="maintext"]').contains('text', ' Your Account Has Been Created!');
 
 
+  cy.clearAllCookies()
 
-    
-    it.only("login", () => {
-      cy.get('#loginFrm_loginname').type('baurina11111');
-      cy.get('#loginFrm_password').type('1234567');
-      cy.get('[title="Login"]').click();
+  // cy.login(user);
 
-      cy.get('span.subtext').should('contain', 'Yana')
-    })
-});
+})
+
+it.skip("Authorization", () => {
+  cy.log('Open website login page');
+  cy.visit('/index.php?rt=account/login');
+
+  cy.log('Check user is unauthorized');
+  cy.getCookie('customer').should('be.null');
+
+  cy.log('Authorize user');
+  cy.get('#loginFrm_loginname').type(user.username);
+  cy.get('#loginFrm_password').type(user.password);
+  cy.get('[title="Login"]').click();
+
+  cy.get('span.subtext').should('contain', user.firstName)
+})
