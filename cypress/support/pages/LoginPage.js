@@ -16,9 +16,9 @@ class HomePage {
     }
 
     submitLoginForm(){
-        cy.log(`Auth user with username: ${username} and pass: ${password}`);
+        cy.log(`Auth user with username: ${user.username} and pass: ${user.password}`);
 
-        this.getLoginField.type(username)
+        this.getLoginField.type(user.username)
         this.getPasswordField.type(password)
         this.getSubmitButton.click()
     }
