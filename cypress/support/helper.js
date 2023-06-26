@@ -1,4 +1,5 @@
 export function login(user) {
+   
     cy.log('Open website login page');
     cy.visit('/index.php?rt=account/login');
   
